@@ -1,0 +1,10 @@
+{
+  "newFileLocation": "folder",
+  "newFileFolderPath": "src/content/posts",
+  "attachmentFolderPath": "src/content/posts/adding-images/attachments",
+  "userIgnoreFilters": [
+    "node_modules/",
+    "dist",
+    ".astro"
+  ]
+}
