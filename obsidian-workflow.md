@@ -157,19 +157,64 @@ Obsidian Git 外掛呼叫的是系統 `git.exe`，跟終端機共用同一份 SS
 2. 該外掛的 `data.json`（含 API key 與 TLS 憑證私鑰）已加進 `.gitignore`，絕對不會被 commit 上 GitHub
 3. v5.1.0 這個外掛本身內建 MCP server（Streamable HTTP），**不需要**額外裝 `uvx mcp-obsidian` 之類的外部包裝
 4. 已在 Local REST API 設定頁打開「Enable non-encrypted (HTTP) server」並完整重啟 Obsidian 讓設定生效，改連 `http://127.0.0.1:27123/mcp/`（純 HTTP，不走自簽憑證那條路）
-5. 已把 API key 寫進：
-   - Zed `%APPDATA%\Zed\settings.json` → `context_servers.obsidian`
-   - `~/.claude/settings.json` → `mcpServers.obsidian`
+5. 兩個 client 的設定**形狀不同**（見下），因為 Zed 跟 Claude Code 對 MCP transport 的支援程度不一樣：
+   - Zed `%APPDATA%\Zed\settings.json` → `context_servers.obsidian`（stdio + `mcp-remote` 橋接）
+   - `~/.claude/settings.json` → `mcpServers.obsidian`（原生 `type: "http"` 直連）
 
-設定格式（兩邊都是同一把 key，`headers.Authorization` 是 `Bearer <apiKey>`）：
+**Claude Code（原生支援，直連即可）**：
 ```json
 {
-  "url": "http://127.0.0.1:27123/mcp/",
-  "headers": { "Authorization": "Bearer <從 .obsidian/plugins/obsidian-local-rest-api/data.json 的 apiKey 欄位複製>" }
+  "obsidian": {
+    "type": "http",
+    "url": "http://127.0.0.1:27123/mcp/",
+    "headers": { "Authorization": "Bearer <從 .obsidian/plugins/obsidian-local-rest-api/data.json 的 apiKey 複製>" }
+  }
 }
 ```
 
-**為什麼不用外掛預設的 HTTPS endpoint（27124）**：外掛用的是自簽憑證，Zed 內建的 HTTP client（Rust reqwest）不會像 `curl -k` 一樣自動跳過憑證驗證，會直接回 `error sending request for url`。外掛官方 README 也明講這種情況建議改走純 HTTP 埠，所以改用 `27123`。
+**Zed（必須用 `mcp-remote` 當 stdio 橋接）**：
+```json
+{
+  "obsidian": {
+    "timeout": 60,
+    "enabled": true,
+    "remote": false,
+    "command": "C:/Program Files/nodejs/node.exe",
+    "args": [
+      "C:/Users/eric.kong/AppData/Roaming/npm/node_modules/mcp-remote/dist/proxy.js",
+      "http://127.0.0.1:27123/mcp/",
+      "--allow-http",
+      "--transport", "http-only",
+      "--silent",
+      "--header", "Authorization: Bearer <apiKey>"
+    ]
+  }
+}
+```
+前置作業：`npm install -g mcp-remote`（裝到 `%APPDATA%\npm\node_modules\mcp-remote`）。
+
+### 踩過的三個坑（依序發生，都有 Zed.log 證據）
+
+**坑 1：HTTPS 自簽憑證被拒**（原本連 `https://127.0.0.1:27124/mcp/`）
+```
+ERROR [rustls_platform_verifier::verification::windows] failed to verify TLS certificate:
+      invalid peer certificate: UnknownIssuer
+ERROR obsidian context server failed to start: error sending request for url (https://127.0.0.1:27124/mcp/)
+```
+Zed 的 HTTP client（Rust rustls）不會像 `curl -k` 那樣跳過憑證驗證。→ 改走純 HTTP 埠 `27123`。
+
+**坑 2：改成純 HTTP 後，`initialize` 掛 60 秒逾時**
+```
+ERROR [context_server::client] cancelled csp request task for "initialize" id 0 which took over 60s
+ERROR obsidian context server failed to start: Context server request timeout
+```
+同一個請求用 curl 打是 0.05 秒回應、串流正常關閉，所以 endpoint 沒問題。原因是外掛的 POST 回應是 `content-type: text/event-stream`（Streamable HTTP 規格），而 Zed 內建的 HTTP MCP client 吃不了這種 SSE 形式的回應；外掛也不支援舊版 SSE transport（`GET /mcp/` 直接回 400）。→ 用 `mcp-remote` 把 Streamable HTTP 轉成 stdio 給 Zed。
+
+**坑 3：橋接不要用 `npx.cmd`**。Windows 上 `.cmd` 會經 cmd.exe 二次解析，路徑含空格就炸：
+```
+'C:\Program' 不是內部或外部命令
+```
+→ 直接用 `node.exe` 執行 `mcp-remote/dist/proxy.js`（跟同檔案裡 `fetch` 用絕對 `python.exe` 路徑的慣例一致）。
 
 **已驗證可用的 16 個 MCP 工具**（實際跑過 handshake + `tools/list` 確認）：
 
@@ -196,4 +241,4 @@ Obsidian Git 外掛呼叫的是系統 `git.exe`，跟終端機共用同一份 SS
 - 純 HTTP 只綁 loopback（127.0.0.1），不會對外網路暴露，同機器風險可接受；千萬不要把這個埠轉發到網路上。
 - 在 Local REST API 設定頁切換「Enable non-encrypted (HTTP) server」這個開關，實測需要**完整重啟 Obsidian**（不是切換分頁）server 才會真的綁定 27123，光切開關、`data.json` 寫入 `true` 不夠。
 - omp 的 MCP/Skill discovery 只在 process 啟動時掃一次，改完 Zed `settings.json` 後要整個重啟 `omp.exe acp`（不是只開新對話）才會出現新工具。
-- **換裝置時**：金鑰是逐機器產生的，不會跟著 vault 同步過去。新機器要重跑一次「開啟 Obsidian → 到 Local REST API 設定頁打開 HTTP server 開關 → 重啟 Obsidian → 讀新的 `data.json` 拿 apiKey → 更新兩邊設定檔」。
+- **換裝置時**：金鑰是逐機器產生的，不會跟著 vault 同步過去。新機器要重跑一次：①開啟 Obsidian ②到 Local REST API 設定頁打開 HTTP server 開關 ③重啟 Obsidian ④`npm install -g mcp-remote` ⑤讀新的 `data.json` 拿 apiKey ⑥更新兩邊設定檔（注意 node.exe 與 mcp-remote 的實際路徑可能不同）
