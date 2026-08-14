@@ -50,6 +50,18 @@ src/content/posts/
 - `cover` 欄位路徑寫法：`cover: ./attachments/cover.jpg`（相對於 .md 檔）
 - 內文插圖語法：`![說明文字](./attachments/section-image.jpg)`
 
+### 模板附帶的教學文放哪
+
+Lipi 內建 7 篇教學文（`introducing-lipi`、`adding-new-posts`、`adding-images`…），已整批移到 **`Docs/lipi-guides/`**（專案根目錄，不在 `src/content/` 底下）。
+
+- 在 Obsidian 裡照樣看得到、可以隨時查
+- 不會被建置成網頁、不會出現在文章列表與 RSS（已用 `astro build` 驗證產出中沒有它們）
+- 用 `git mv` 搬的，git 歷史保留
+
+搬完之後網站可能一篇已發布文章都沒有，而原本 `src/pages/index.astro` 是直接寫 `<FeaturedPost post={allPosts[0]} />`，空陣列會讓 `post.data` 解構失敗、**整個建置崩潰**。已加上 `allPosts.length > 0` 防護。
+
+> **建置快取雷**：搬動 `src/content/` 裡的檔案後，本機 `astro build` 可能仍報 `ImageNotFound`，指向已經不存在的舊路徑。Astro 的內容層快取在 **`node_modules/.astro/data-store.json`**（不是 `.astro/`），刪掉它再建即可。Cloudflare 上是全新 `npm install`，不會遇到。
+
 ## 3. Frontmatter 格式（對應 src/content.config.ts）
 
 ```yaml
