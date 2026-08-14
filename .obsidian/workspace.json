@@ -8,17 +8,17 @@
         "type": "tabs",
         "children": [
           {
-            "id": "6b60b539d136ea49",
+            "id": "59c9de5f44bfa6a2",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "src/content/posts/configuring-lipi.md",
+                "file": "src/content/posts/Untitled.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "configuring-lipi"
+              "title": "Untitled"
             }
           }
         ]
@@ -183,9 +183,44 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "6b60b539d136ea49",
+  "active": "59c9de5f44bfa6a2",
   "lastOpenFiles": [
-    "src/content/posts/adding-images/index.md",
-    "src/content/posts/adding-new-posts.md"
+    "Untitled.md",
+    "Docs/lipi-guides/adding-images/gallery/placeholder-8.png",
+    "Docs/lipi-guides/adding-images/gallery/placeholder-7.png",
+    "Docs/lipi-guides/adding-images/gallery/placeholder-6.png",
+    "Docs/lipi-guides/adding-images/gallery/placeholder-5.png",
+    "Docs/lipi-guides/adding-images/gallery/placeholder-4.png",
+    "Docs/lipi-guides/adding-images/gallery/placeholder-3.png",
+    "Docs/lipi-guides/adding-images/gallery/placeholder-2.png",
+    "Docs/lipi-guides/adding-images/gallery/placeholder-1.png",
+    "Docs/lipi-guides/adding-images/attachments/inline-image-4.png",
+    "Docs/lipi-guides/adding-images/attachments/inline-image.png",
+    "Docs/lipi-guides/adding-images/index.md",
+    "Docs/lipi-guides/adding-images/gallery",
+    "Docs/lipi-guides/adding-images/attachments",
+    "Docs/lipi-guides/adding-images",
+    "Docs/lipi-guides/markdown-elements.md",
+    "Docs/lipi-guides/introducing-lipi.md",
+    "Docs/lipi-guides/customising-lipi.md",
+    "Docs/lipi-guides/configuring-lipi.md",
+    "Docs/lipi-guides/colour-schemes.md",
+    "Docs/lipi-guides/adding-new-posts.md",
+    "Docs/lipi-guides",
+    "Docs",
+    "src/content/posts/adding-new-posts.md",
+    "src/content/posts/Untitled.md",
+    "src/content/posts/markdown-elements.md",
+    "src/content/posts/colour-schemes.md",
+    "src/content/posts/customising-lipi.md",
+    "src/content/posts/configuring-lipi.md",
+    "dist/sitemap-0.xml",
+    "dist/sitemap-index.xml",
+    "dist/colophon/index.html",
+    "dist/colophon",
+    "dist/index.html",
+    "src/content/posts/plainfolder/index.md",
+    "src/content/posts/_slugtest/slugtest.md",
+    "src/content/posts/adding-images/index.md"
   ]
 }
