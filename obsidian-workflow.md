@@ -153,25 +153,23 @@ Obsidian Git 外掛呼叫的是系統 `git.exe`，跟終端機共用同一份 SS
 讓 Zed 裡的 AI Agent（omp、claude-acp）能透過 MCP 直接操作這個 vault（依標題/區塊插入內容、觸發 Obsidian 指令、用 Obsidian 自己的搜尋索引），而不只是單純讀寫檔案。
 
 **已完成**：
-1. 安裝並啟用 **Local REST API** 外掛（`coddingtonbear/obsidian-local-rest-api`，v5.1.0），vault 內對應 `.obsidian/plugins/obsidian-local-rest-api/`
+1. 安裝並啟用 **Local REST API** 外掛（`coddingtonbear/obsidian-local-rest-api`，v5.1.0，從官方 GitHub Release 下載，sha256 核對過），vault 內對應 `.obsidian/plugins/obsidian-local-rest-api/`
 2. 該外掛的 `data.json`（含 API key 與 TLS 憑證私鑰）已加進 `.gitignore`，絕對不會被 commit 上 GitHub
+3. v5.1.0 這個外掛本身內建 MCP server（Streamable HTTP，endpoint 是 `https://127.0.0.1:27124/mcp/`），**不需要**額外裝 `uvx mcp-obsidian` 之類的外部包裝
+4. 已把 API key 寫進：
+   - Zed `%APPDATA%\Zed\settings.json` → `context_servers.obsidian`
+   - `~/.claude/settings.json` → `mcpServers.obsidian`
 
-**待手動完成一次**（重開/首次啟動 Obsidian 讓外掛生成金鑰後）：
-1. 開啟 Obsidian，讓 Local REST API 外掛啟動一次（它會自動產生 API key，寫進上述 `data.json`）
-2. 到 MCP client 設定（Zed `settings.json` → `context_servers`，或 `~/.claude/settings.json` → `mcpServers`）加入：
+設定格式（兩邊都是同一把 key，`headers.Authorization` 是 `Bearer <apiKey>`）：
 ```json
 {
-  "mcp-obsidian": {
-    "command": "uvx",
-    "args": ["mcp-obsidian"],
-    "env": {
-      "OBSIDIAN_API_KEY": "<從 data.json 或 Obsidian 設定 → Local REST API 頁面複製>",
-      "OBSIDIAN_HOST": "127.0.0.1",
-      "OBSIDIAN_PORT": "27124"
-    }
-  }
+  "url": "https://127.0.0.1:27124/mcp/",
+  "headers": { "Authorization": "Bearer <從 .obsidian/plugins/obsidian-local-rest-api/data.json 的 apiKey 欄位複製>" }
 }
 ```
-3. 重啟對應的 agent process 讓新 MCP server 生效（omp 只在啟動時掃描一次 MCP/Skill）
 
-換裝置時要重新走一次「待手動完成」的兩步（金鑰是逐機器產生的，不會跟著 vault 同步過去）。
+**注意事項**：
+- 這組 endpoint 只在 Obsidian 開著、且 Local REST API 外掛啟用時才活著；Obsidian 關掉 MCP 工具就會斷線。
+- 憑證是外掛自簽的 TLS 憑證（非受信任 CA），走的是 loopback（127.0.0.1），Zed／Claude 的 HTTP MCP client 都能直接吃，不用額外處理。
+- omp 的 MCP/Skill discovery 只在 process 啟動時掃一次，改完 Zed `settings.json` 後要整個重啟 `omp.exe acp`（不是只開新對話）才會出現新工具。
+- **換裝置時**：金鑰是逐機器產生的，不會跟著 vault 同步過去。新機器要重跑一次「開啟 Obsidian → 讀新的 `data.json` 拿 apiKey → 更新兩邊設定檔」。
