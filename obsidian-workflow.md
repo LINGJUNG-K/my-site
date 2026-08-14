@@ -171,6 +171,26 @@ Obsidian Git 外掛呼叫的是系統 `git.exe`，跟終端機共用同一份 SS
 
 **為什麼不用外掛預設的 HTTPS endpoint（27124）**：外掛用的是自簽憑證，Zed 內建的 HTTP client（Rust reqwest）不會像 `curl -k` 一樣自動跳過憑證驗證，會直接回 `error sending request for url`。外掛官方 README 也明講這種情況建議改走純 HTTP 埠，所以改用 `27123`。
 
+**已驗證可用的 16 個 MCP 工具**（實際跑過 handshake + `tools/list` 確認）：
+
+| 分類 | 工具 |
+|---|---|
+| 檔案 CRUD | `vault_list`、`vault_read`、`vault_write`、`vault_append`、`vault_delete`、`vault_move`、`vault_copy` |
+| 結構化編輯 | `vault_patch`（依標題/區塊/frontmatter 精準插入）、`vault_get_document_map`（取得標題樹） |
+| 搜尋 | `search_simple`（Obsidian 內建搜尋）、`search_query`（JsonLogic 查 frontmatter/tags/path） |
+| Obsidian 操控 | `command_list`、`command_execute`、`open_file`、`active_file_get_path`、`tag_list` |
+
+**好用的指令 ID**（給 `command_execute` 用，全 vault 共 242 個指令）：
+
+| 指令 ID | 作用 |
+|---|---|
+| `obsidian-git:push` | Git: Commit-and-sync（一步完成 commit + push，等於觸發 Cloudflare 重新部署） |
+| `obsidian-git:pull` | Git: Pull |
+| `obsidian-git:open-git-view` | 開啟版本控制面板 |
+| `quickadd:choice:e4c7dd7f-0f17-4691-b6d8-f5ffa4ef4387` | QuickAdd: 新增文章（第 5 節那個 Choice） |
+
+意思是：AI Agent 可以「用 `vault_patch` 改文章 → 用 `command_execute` 跑 `obsidian-git:push`」，全程不碰終端機就完成發布。
+
 **注意事項**：
 - 這組 endpoint 只在 Obsidian 開著、且 Local REST API 外掛啟用時才活著；Obsidian 關掉 MCP 工具就會斷線。
 - 純 HTTP 只綁 loopback（127.0.0.1），不會對外網路暴露，同機器風險可接受；千萬不要把這個埠轉發到網路上。
