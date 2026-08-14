@@ -3,7 +3,7 @@ import type { UserConfig } from "../src/site.config";
 const userConfig: UserConfig = {
   title: "不想變成討厭的樣子啊",
   description:
-    "如果可以，我想當個值得被愛的爸爸",
+    "真希望能成為一個值得被愛的爸爸",
 
   url: "https://my-site-8sm.pages.dev/",
   author: "LJK",
