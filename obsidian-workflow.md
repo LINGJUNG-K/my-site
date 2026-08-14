@@ -22,23 +22,33 @@
 
 ## 2. 文章資料夾結構
 
-Lipi 模板採「一篇文章一個資料夾」的結構：
+**關鍵規則**：`src/content/posts/` 底下的**資料夾名稱會變成網址的一段**，而 `_` 開頭的資料夾會被剝離出網址。一篇文章就是**一個 .md 檔，檔名即 slug**——沒有 `index.md` 這種「資料夾當容器」的用法。
+
+實測對照（跑 `astro build` 看 `dist/` 實際產出）：
+
+| 檔案位置 | 產生的網址 | |
+|---|---|---|
+| `posts/my-post.md` | `/posts/my-post` | 乾淨 |
+| `posts/_my-post/my-post.md` | `/posts/my-post` | 乾淨，且有專屬資料夾放圖 |
+| `posts/my-post/index.md` | `/posts/my-post/my-post` | **網址重複，錯的** |
+| `posts/travel/kyoto.md` | `/posts/travel/kyoto` | 刻意分類時才這樣用 |
+
+> 模板自帶的 `adding-images/index.md` 就是踩到這個雷，它的網址真的是 `/posts/adding-images/adding-images`。
+
+**所以採用的結構**（QuickAdd 已設定成自動產生這個形狀）：
 
 ```
 src/content/posts/
-  └── my-post/
-        ├── index.md          ← 文章本體
-        ├── attachments/      ← 封面圖、內文插圖
-        │     ├── cover.jpg
-        │     └── section-image.jpg
-        └── gallery/          ← 相簿功能，自動偵測，需手動建立
-              ├── 01-first.jpg
-              └── 02-second.jpg
+  ├── simple-post.md              ← 沒有圖的文章，單檔即可
+  └── _my-post/                   ← 有圖的文章，底線資料夾（不影響網址）
+        ├── my-post.md            ← 文章本體，檔名 = slug = 網址
+        └── attachments/          ← 封面圖、內文插圖
+              ├── cover.jpg
+              └── section-image.jpg
 ```
 
-- `cover` 欄位路徑寫法：`cover: ./attachments/cover.jpg`
+- `cover` 欄位路徑寫法：`cover: ./attachments/cover.jpg`（相對於 .md 檔）
 - 內文插圖語法：`![說明文字](./attachments/section-image.jpg)`
-- `gallery/` 資料夾目前沒有自動化，用不到就不用建
 
 ## 3. Frontmatter 格式（對應 src/content.config.ts）
 
@@ -63,7 +73,7 @@ annotation:               # 選填，手寫風格短語
 → 改成 **In subfolder under current file**，資料夾名稱填 `attachments`
 
 效果：貼圖片時會自動存進該篇文章同層的 `attachments/` 資料夾，不用手動搬移。
-`gallery/` 資料夾例外，需要手動建立（右鍵文章資料夾 → New folder → 命名 `gallery`）。
+搭配第 2 節的 `_<slug>/<slug>.md` 結構，圖片就會乖乖待在那篇文章自己的資料夾裡。
 
 ## 5. QuickAdd：一鍵新增文章
 
@@ -89,12 +99,12 @@ draft: true
 | 欄位 | 填入內容 |
 |---|---|
 | Template Path | 上面那個範本檔 |
-| Set file name format | `{{VALUE:slug}}/index` |
+| Set file name format | `_{{VALUE:slug}}/{{VALUE:slug}}` |
 | Create in folder | `src/content/posts` |
 | Open | 開啟（建立後自動打開） |
 
 設定好後可在 QuickAdd 主畫面開啟閃電圖示，或指定熱鍵快速執行。
-執行時會依序詢問 slug、title、description、category，自動建好資料夾與 index.md。
+執行時會依序詢問 slug、title、description、category，自動建好 `_<slug>/` 資料夾與 `<slug>.md`。
 
 > 已直接寫入 `.obsidian/plugins/quickadd/data.json` 完成設定（choice 名稱「新增文章」），範本檔實際放在 `Templates/post-template.md`。換裝置只需把 vault 整個資料夾（含 `.obsidian/`）同步過去即可沿用，不用重新跑一次 GUI 設定。
 

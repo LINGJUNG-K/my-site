@@ -8,12 +8,17 @@
       "templatePath": "Templates/post-template.md",
       "folder": {
         "enabled": true,
-        "folders": ["src/content/posts"],
+        "folders": [
+          "src/content/posts"
+        ],
         "chooseWhenCreatingNote": false,
         "createInSameFolderAsActiveFile": false,
         "chooseFromSubfolders": false
       },
-      "fileNameFormat": { "enabled": true, "format": "{{VALUE:slug}}/index" },
+      "fileNameFormat": {
+        "enabled": true,
+        "format": "_{{VALUE:slug}}/{{VALUE:slug}}"
+      },
       "discoverExistingNotesBeforeCreate": false,
       "appendLink": false,
       "openFile": true,
@@ -23,7 +28,9 @@
         "mode": "default",
         "focus": true
       },
-      "fileExistsBehavior": { "kind": "prompt" }
+      "fileExistsBehavior": {
+        "kind": "prompt"
+      }
     }
   ],
   "inputPrompt": "single-line",
@@ -32,7 +39,9 @@
   "searchNestedChoices": true,
   "templateFolderLauncherRow": "bottom",
   "devMode": false,
-  "templateFolderPaths": ["Templates"],
+  "templateFolderPaths": [
+    "Templates"
+  ],
   "announceUpdates": "major",
   "version": "2.22.0",
   "globalVariables": {},
