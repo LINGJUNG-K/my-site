@@ -36,3 +36,6 @@ public/pagefind/*
 AGENTS.md
 TODO.md
 skills-lock.json
+
+# Obsidian Local REST API plugin secret (API key + TLS cert)
+.obsidian/plugins/obsidian-local-rest-api/data.json

@@ -1,12 +1,38 @@
 {
-  "choices": [],
+  "choices": [
+    {
+      "id": "e4c7dd7f-0f17-4691-b6d8-f5ffa4ef4387",
+      "name": "新增文章",
+      "type": "Template",
+      "command": true,
+      "templatePath": "Templates/post-template.md",
+      "folder": {
+        "enabled": true,
+        "folders": ["src/content/posts"],
+        "chooseWhenCreatingNote": false,
+        "createInSameFolderAsActiveFile": false,
+        "chooseFromSubfolders": false
+      },
+      "fileNameFormat": { "enabled": true, "format": "{{VALUE:slug}}/index" },
+      "discoverExistingNotesBeforeCreate": false,
+      "appendLink": false,
+      "openFile": true,
+      "fileOpening": {
+        "location": "tab",
+        "direction": "vertical",
+        "mode": "default",
+        "focus": true
+      },
+      "fileExistsBehavior": { "kind": "prompt" }
+    }
+  ],
   "inputPrompt": "single-line",
   "persistInputPromptDrafts": true,
   "useSelectionAsCaptureValue": true,
   "searchNestedChoices": true,
   "templateFolderLauncherRow": "bottom",
   "devMode": false,
-  "templateFolderPaths": [],
+  "templateFolderPaths": ["Templates"],
   "announceUpdates": "major",
   "version": "2.22.0",
   "globalVariables": {},
