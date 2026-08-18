@@ -2,7 +2,11 @@
 title: 回到家的待辦清單
 description: 關於每天回家路上的那份清單。
 published: 2026-08-14
+category: Family
+tags:
+cover:
 draft: false
+lang: zh-TW
 ---
 
 每次快回到家的時候，腦子就會開始盤點一到家哪些事情要做，先後順序。

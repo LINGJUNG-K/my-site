@@ -1,16 +1,14 @@
 ---
-title: "完整文章 Frontmatter 範本與說明"
-description: "這是一篇不會發布的範本檔案，包含 Lipi 網站模板支援的所有設定欄位與說明。"
+title: 完整文章 Frontmatter 範本與說明
+description: 這是一篇不會發布的範本檔案，包含 Lipi 網站模板支援的所有設定欄位與說明。
 published: 2026-08-18
-updated: 2026-08-18
-category: "範本說明"
+category: 範本說明
 tags:
-  - "template"
-  - "guide"
-cover: "./attachments/cover.jpg"
+  - template
+  - guide
+cover: ./attachments/cover.jpg
 draft: true
-lang: "zh-TW"
-annotation: "這是一行手寫風格的筆記註解~"
+lang: zh-TW
 ---
 
 # Frontmatter 欄位完整說明

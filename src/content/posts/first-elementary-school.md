@@ -2,7 +2,11 @@
 title: 山的小學第一天
 description: 又一次的環境轉換，緊張依舊，但感動非凡
 published: 2026-08-18
+category: Family
+tags:
+cover:
 draft: false
+lang: zh-TW
 ---
 2026-8-15這一天是特別的一天，雖然是星期六但卻是哥哥開學的第一天。
 這一天所有人，學生、家長、老師一起整理校園，準備好心情迎接開學。
