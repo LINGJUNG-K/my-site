@@ -12,19 +12,24 @@ function removeDupsAndLowerCase(array: string[]) {
 	return Array.from(distinctItems);
 }
 
+const nullableString = z.string().or(z.null()).transform((val) => (val === null || val === "" ? undefined : val));
+
 const postsCollection = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: `./${POSTS_PATH}` }),
   schema: z.object({
     title: z.string(),
-    description: z.string().optional().default(""),
+    description: z.string().or(z.null()).transform((val) => val ?? "").optional().default(""),
     published: z.coerce.date(),
-    updated: z.coerce.date().optional(),
-    category: z.string().optional().default("Travels"),
-    tags: z.array(z.string()).transform(removeDupsAndLowerCase).optional(),
-    cover: z.string().optional(),
+    updated: z.preprocess((val) => (val === null || val === "" ? undefined : val), z.coerce.date().optional()),
+    category: z.string().or(z.null()).transform((val) => (val && val.trim() ? val : "Travels")).optional().default("Travels"),
+    tags: z.preprocess(
+      (val) => (val === null || val === "" ? [] : val),
+      z.array(z.string()).transform(removeDupsAndLowerCase).optional().default([])
+    ),
+    cover: nullableString.optional(),
     draft: z.boolean().default(false),
-    lang: z.string().optional(),
-    annotation: z.string().optional(),
+    lang: nullableString.optional(),
+    annotation: nullableString.optional(),
   })
 });
 
